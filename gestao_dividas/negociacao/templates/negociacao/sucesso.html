@@ -1,0 +1,6 @@
+<h1>Negociação Selecionada com Sucesso!</h1>
+<p>Você escolheu a opção: {{ opcao.tipo }}</p>
+<p>Total a pagar: R$ {{ opcao.calcular_total }}</p>
+{% if opcao.parcelas %}
+    <p>Parcelas: {{ opcao.parcelas }} x R$ {{ opcao.calcular_valor_parcela }}</p>
+{% endif %}

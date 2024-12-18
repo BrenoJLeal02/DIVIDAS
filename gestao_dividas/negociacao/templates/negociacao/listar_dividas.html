@@ -1,0 +1,16 @@
+<!-- negociacao/templates/negociacao/listar_dividas.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dívidas</title>
+</head>
+<body>
+    <h1>Lista de Dívidas</h1>
+    <ul>
+        {% for divida in dividas %}
+            <li><a href="{% url 'detalhe_divida' divida.id %}">{{ divida.contribuinte }} - R$ {{ divida.valor_principal }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

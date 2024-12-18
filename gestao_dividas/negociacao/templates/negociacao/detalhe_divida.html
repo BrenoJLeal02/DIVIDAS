@@ -1,0 +1,18 @@
+<h2>Opções de Negociação</h2>
+<form method="POST">
+    {% csrf_token %}
+    <ul>
+        {% for opcao in opcoes %}
+            <li>
+                <label>
+                    <input type="radio" name="opcao_id" value="{{ opcao.id }}" required>
+                    Tipo: {{ opcao.tipo }} | Total: R$ {{ opcao.calcular_total }} 
+                    {% if opcao.parcelas %}
+                        | Parcelas: {{ opcao.parcelas }} x R$ {{ opcao.calcular_valor_parcela }}
+                    {% endif %}
+                </label>
+            </li>
+        {% endfor %}
+    </ul>
+    <button type="submit">Selecionar Opção</button>
+</form>
