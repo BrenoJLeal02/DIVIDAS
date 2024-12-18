@@ -21,7 +21,8 @@ import {
   Td,
   useToast,
   Spinner,
-  Center
+  Center,
+  HStack,
 } from '@chakra-ui/react';
 
 export function ResultadoPage() {
@@ -160,15 +161,26 @@ export function ResultadoPage() {
                     </Tr>
                   </Tbody>
                 </Table>
+
+                {/* Botão Negociar */}
+                <HStack justify="flex-end" mt={4}>
+                  <Button
+                    size="md"
+                    colorScheme="teal"
+                    onClick={() => navigate('/negociar')} // Navega para a página de negociação
+                  >
+                    Negociar
+                  </Button>
+                </HStack>
               </AccordionPanel>
             </AccordionItem>
           </Accordion>
 
+          {/* Botão Nova Consulta */}
           <Button
             colorScheme="teal"
             mt={6}
-            
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/')} // Navega para a página inicial de consulta
           >
             Nova Consulta
           </Button>
