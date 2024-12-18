@@ -1,19 +1,22 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
-// Função para buscar a dívida pelo CPF ou CNPJ
-export const buscarPorDocumento = async (cpf?: string, cnpj?: string): Promise<any> => {
-  try {
-    const params = cpf ? { cpf } : { cnpj }; // Define os parâmetros para a API
-    const response: AxiosResponse<any> = await axios.get(
-      'http://127.0.0.1:8000/api/dividas/buscar_por_documento/',
-      { params }
-    );
-    return response.data; // Retorna os dados diretamente
-  } catch (error: any) {
-    if (error.response) {
-      throw error.response.data; // Lança o erro retornado pela API
-    } else {
-      throw { error: 'Erro desconhecido' };
-    }
-  }
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api/',  // A URL do backend
+  headers: {
+    'Content-Type': 'application/json',  // Garantir que o tipo do conteúdo esteja correto
+  },
+});
+
+// Requisição para POST de consulta (cpf ou cnpj)
+export const postConsulta = async (cpf?: string, cnpj?: string) => {
+  const response = await api.post('dividas/buscar_por_documento/', { cpf, cnpj });
+  return response.data;
 };
+
+// Requisição para GET de detalhe da dívida
+// services/api.ts
+export const getDividaDetalhe = async (id: number) => {
+  const response = await api.get(`dividas/${id}/`);
+  return response.data;
+};
+

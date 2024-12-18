@@ -1,4 +1,4 @@
-import {ConsultaPage} from '../pages/Consulta/ConsultaPage.tsx'
+import ConsultaPage from '../pages/Consulta/ConsultaPage.tsx'
 import {ResultadoPage} from '../pages/Resultados/ResultadoPage.tsx'
 export function Consulta() {
   return (
