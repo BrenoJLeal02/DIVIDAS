@@ -1,12 +1,15 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import DividaViewSet
+from .views import DividaViewSet, ConsultaDividaView
 
-# Criação do roteador
+# Criando o roteador e registrando o viewset para dividas
 router = DefaultRouter()
 router.register(r'dividas', DividaViewSet, basename='divida')
 
 urlpatterns = [
-    path('', include(router.urls)),  # Inclui todas as rotas do roteador (dividas)
-    path('dividas/buscar_por_documento/', DividaViewSet.as_view({'get': 'buscar_por_documento'}), name='buscar_por_documento'),  # Rota customizada
+    # A URL para a consulta (POST)
+    path('dividas/buscar_por_documento/', ConsultaDividaView.as_view(), name='buscar_por_documento'),
+    
+    # O roteador gerencia as rotas para dividas, incluindo o GET para detalhes
+    path('', include(router.urls)),
 ]

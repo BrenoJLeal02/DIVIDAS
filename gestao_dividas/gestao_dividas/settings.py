@@ -55,9 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # onde o React será executado
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'gestao_dividas.urls'
 
