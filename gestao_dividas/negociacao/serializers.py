@@ -7,11 +7,15 @@ class DividaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OpcaoNegociacaoSerializer(serializers.ModelSerializer):
-    total = serializers.SerializerMethodField()
-
     class Meta:
         model = OpcaoNegociacao
-        fields = ['id', 'tipo', 'desconto_multa', 'desconto_juros', 'parcelas', 'total']
+        fields = '__all__'
 
-    def get_total(self, obj):
-        return obj.calcular_total()
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        tipo_display = dict(OpcaoNegociacao._meta.get_field('tipo').choices).get(instance.tipo, instance.tipo)
+        representation['tipo'] = tipo_display
+
+        # Adicionando o valor de juros da Dívida
+        representation['juros'] = instance.divida.juros if instance.divida else 0
+        return representation
