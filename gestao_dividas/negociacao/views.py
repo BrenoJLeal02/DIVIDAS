@@ -1,10 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Divida
-from .serializers import DividaSerializer
-
+from .models import Divida, OpcaoNegociacao
+from .serializers import DividaSerializer, OpcaoNegociacaoSerializer
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 
 # Manter a consulta por POST
@@ -28,3 +28,10 @@ class ConsultaDividaView(APIView):
 class DividaViewSet(viewsets.ModelViewSet):
     queryset = Divida.objects.all()
     serializer_class = DividaSerializer
+
+    @action(detail=True, methods=['get'])
+    def opcoes_negociacao(self, request, pk=None):
+        divida = self.get_object()  # Obtém a dívida com base no ID passado na URL
+        opcoes = divida.opcoes_negociacao.all()  # Pega as opções de negociação associadas à dívida
+        serializer = OpcaoNegociacaoSerializer(opcoes, many=True)  # Serializa as opções de negociação
+        return Response(serializer.data)  # Retorna as opções como resposta JSON

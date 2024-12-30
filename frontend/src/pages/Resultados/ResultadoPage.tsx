@@ -165,12 +165,15 @@ export function ResultadoPage() {
                 {/* Botão Negociar */}
                 <HStack justify="flex-end" mt={4}>
                   <Button
-                    size="md"
-                    colorScheme="teal"
-                    onClick={() => navigate('/negociar')} // Navega para a página de negociação
+                      size="md"
+                      colorScheme="teal"
+                      onClick={() => navigate('/negociar', { state: { id: resultado.id } })}
                   >
-                    Negociar
+                      Negociar
                   </Button>
+
+
+
                 </HStack>
               </AccordionPanel>
             </AccordionItem>

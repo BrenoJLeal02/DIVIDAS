@@ -20,3 +20,8 @@ export const getDividaDetalhe = async (id: number) => {
   return response.data;
 };
 
+export const getOpcoesNegociacao = async (id: number) => {
+  const response = await api.get(`dividas/${id}/opcoes_negociacao/`);
+  return response.data;
+};
+

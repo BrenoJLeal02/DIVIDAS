@@ -1,8 +1,6 @@
+# Negociacao/models.py
+
 from django.db import models
-from django.core.validators import RegexValidator
-from django.core.exceptions import ValidationError
-
-
 from django.core.exceptions import ValidationError
 
 class Divida(models.Model):
@@ -19,10 +17,8 @@ class Divida(models.Model):
         return f'Dívida {self.id} - {self.contribuinte}'
 
     def clean(self):
-        # Garantir que pelo menos um dos campos (cpf ou cnpj) seja preenchido
         if not self.cpf and not self.cnpj:
             raise ValidationError("É necessário informar pelo menos um dos campos: CPF ou CNPJ.")
-
 
 class OpcaoNegociacao(models.Model):
     divida = models.ForeignKey(Divida, on_delete=models.CASCADE, related_name="opcoes_negociacao")
