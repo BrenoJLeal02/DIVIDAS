@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getOpcoesNegociacao } from '../../services/api';
 import {
@@ -32,6 +32,11 @@ const NegociarPage: React.FC = () => {
     const [parcelasSelecionadas, setParcelasSelecionadas] = useState<number | null>(null);
     const [simulacao, setSimulacao] = useState<{ valorTotal: number, parcelas: number, valorParcela: number } | null>(null);
 
+    // Função para calcular valores com desconto
+    const calcularValorComDesconto = (valor: string, desconto: number) => {
+        return parseFloat(valor) * (1 - desconto / 100);
+    };
+
     useEffect(() => {
         if (!id) {
             setErro('Nenhum ID fornecido.');
@@ -61,66 +66,57 @@ const NegociarPage: React.FC = () => {
     const handleParcelasChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const parcelas = Number(event.target.value);
         setParcelasSelecionadas(parcelas);
-
+    
         if (parcelas > 0) {
             const opcaoSelecionada = opcoes.find(opcao => opcao.parcelas === parcelas);
+    
             if (opcaoSelecionada) {
-                // Ajustando cálculo do valor total considerando juros reais
                 const descontoMulta = opcaoSelecionada.desconto_multa || 0;
                 const descontoJuros = opcaoSelecionada.desconto_juros || 0;
-
-                // Calcular os valores com desconto
-                const multaComDesconto = parseFloat(multa) * (1 - descontoMulta / 100);
-                const jurosComDesconto = parseFloat(juros) * (1 - descontoJuros / 100);
-
-                // Valor total da negociação considerando desconto
-                const valorTotal = parseFloat(valorPrincipal) + multaComDesconto + jurosComDesconto;
-
-                // Calcular o valor da parcela
+    
+                // Valores com descontos aplicados
+                const multaComDesconto = calcularValorComDesconto(multa, descontoMulta);
+                const jurosComDesconto = calcularValorComDesconto(juros, descontoJuros);
+    
+                // Saldo inicial após descontos
+                const saldoInicial = parseFloat(valorPrincipal) + multaComDesconto + jurosComDesconto;
+    
+                // Juros mensais (1% como exemplo, pode ser ajustado)
+                const taxaJurosMensal = 0.01;
+    
+                // Valor total com juros compostos no parcelamento
+                const valorTotal = saldoInicial * Math.pow(1 + taxaJurosMensal, parcelas);
+    
+                // Valor de cada parcela
                 const valorParcela = valorTotal / parcelas;
-
+    
                 setSimulacao({ valorTotal, parcelas, valorParcela });
             }
         } else {
             setSimulacao(null);
         }
     };
+    
 
-    // Função para calcular o valor final com desconto para pagamento à vista
-    const calcularValorFinalAVista = () => {
+    const calcularValorFinalAVista = useMemo(() => {
         const descontoMulta = opcoes.find(opcao => opcao.tipo === 'À Vista')?.desconto_multa || 0;
         const descontoJuros = opcoes.find(opcao => opcao.tipo === 'À Vista')?.desconto_juros || 0;
 
-        const multaComDesconto = (parseFloat(multa) * (1 - descontoMulta / 100)).toFixed(2);
-        const jurosComDesconto = (parseFloat(juros) * (1 - descontoJuros / 100)).toFixed(2);
+        const multaComDesconto = calcularValorComDesconto(multa, descontoMulta);
+        const jurosComDesconto = calcularValorComDesconto(juros, descontoJuros);
 
-        const valorTotalAVista = (
-            parseFloat(valorPrincipal) + 
-            parseFloat(multaComDesconto) + 
-            parseFloat(jurosComDesconto)
-        ).toFixed(2);
+        return (parseFloat(valorPrincipal) + multaComDesconto + jurosComDesconto).toFixed(2);
+    }, [opcoes, multa, juros, valorPrincipal]);
 
-        return valorTotalAVista;
-    };
-
-    // Função para calcular o valor final do parcelamento com desconto
-    const calcularValorFinalParcelado = (opcao: any) => {
+    const calcularValorFinalParcelado = useMemo(() => (opcao: any) => {
         const descontoMulta = opcao.desconto_multa || 0;
         const descontoJuros = opcao.desconto_juros || 0;
 
-        // Descontando a multa e juros aplicados
-        const multaComDesconto = (parseFloat(multa) * (1 - descontoMulta / 100)).toFixed(2);
-        const jurosComDesconto = (parseFloat(juros) * (1 - descontoJuros / 100)).toFixed(2);
+        const multaComDesconto = calcularValorComDesconto(multa, descontoMulta);
+        const jurosComDesconto = calcularValorComDesconto(juros, descontoJuros);
 
-        // Calculando o valor total parcelado
-        const valorTotalParcelado = (
-            parseFloat(valorPrincipal) + 
-            parseFloat(multaComDesconto) + 
-            parseFloat(jurosComDesconto)
-        ).toFixed(2);
-
-        return valorTotalParcelado;
-    };
+        return (parseFloat(valorPrincipal) + multaComDesconto + jurosComDesconto).toFixed(2);
+    }, [multa, juros, valorPrincipal]);
 
     if (loading) {
         return (
@@ -169,7 +165,6 @@ const NegociarPage: React.FC = () => {
                                         <Badge colorScheme={opcao.tipo?.toLowerCase() === 'à vista' ? 'green' : 'blue'} mr={3}>
                                             {opcao.tipo?.toLowerCase() === 'à vista' ? 'À Vista' : 'Parcelado'}
                                         </Badge>
-
                                         {opcao.tipo === 'À Vista' ? (
                                             <Icon as={FaCheckCircle} color="green.400" />
                                         ) : (
@@ -209,17 +204,7 @@ const NegociarPage: React.FC = () => {
                                         >
                                             {Array.from({ length: opcao.parcelas }, (_, index) => {
                                                 const parcelas = index + 1;
-
-                                                // Calcular os valores com desconto
-                                                const descontoMulta = opcao.desconto_multa || 0;
-                                                const descontoJuros = opcao.desconto_juros || 0;
-                                                
-                                                const multaComDesconto = parseFloat(multa) * (1 - descontoMulta / 100);
-                                                const jurosComDesconto = parseFloat(juros) * (1 - descontoJuros / 100);
-                                                
-                                                const valorTotal = parseFloat(valorPrincipal) + multaComDesconto + jurosComDesconto;
-
-                                                // Calcular o valor da parcela
+                                                const valorTotal = parseFloat(valorPrincipal) + calcularValorComDesconto(multa, opcao.desconto_multa) + calcularValorComDesconto(juros, opcao.desconto_juros);
                                                 const valorParcela = valorTotal / parcelas;
 
                                                 return (
@@ -255,7 +240,7 @@ const NegociarPage: React.FC = () => {
                                             Valor à vista com desconto:
                                         </Text>
                                         <Text>
-                                            R$ {calcularValorFinalAVista()}
+                                            R$ {calcularValorFinalAVista}
                                         </Text>
                                     </Box>
                                 )}
@@ -275,7 +260,18 @@ const NegociarPage: React.FC = () => {
                                     <Button
                                         colorScheme="teal"
                                         onClick={() =>
-                                            navigate('/confirmar-negociacao', { state: { opcao, parcelasSelecionadas } })
+                                            navigate('/confirmar-negociacao', {
+                                                state: {
+                                                    id,
+                                                    opcao,
+                                                    parcelasSelecionadas,
+                                                    valorPrincipal,
+                                                    multa,
+                                                    juros,
+                                                    valorFinalAVista: calcularValorFinalAVista,
+                                                    valorFinalParcelado: calcularValorFinalParcelado(opcao),
+                                                },
+                                            })
                                         }
                                         isDisabled={opcao.tipo === 'Parcelado' && !parcelasSelecionadas}
                                     >
