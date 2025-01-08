@@ -216,20 +216,21 @@ const NegociarPage: React.FC = () => {
                                         </Select>
 
                                         {simulacao && (
-                                            <Box mt={4} p={4} bg="gray.100" borderRadius="md">
-                                                <Text fontWeight="bold">
-                                                    Simulação de Parcelamento:
-                                                </Text>
-                                                <Text>
-                                                    Valor total com juros: R$ {simulacao.valorTotal.toFixed(2)}
-                                                </Text>
-                                                <Text>
-                                                    Número de Parcelas: {simulacao.parcelas}
-                                                </Text>
-                                                <Text>
-                                                    Valor da Parcela: R$ {simulacao.valorParcela.toFixed(2)}
-                                                </Text>
-                                            </Box>
+                                            <></>
+                                            // <Box mt={4} p={4} bg="gray.100" borderRadius="md">
+                                            //     <Text fontWeight="bold">
+                                            //         Simulação de Parcelamento:
+                                            //     </Text>
+                                            //     <Text>
+                                            //         Valor total com juros: R$ {simulacao.valorTotal.toFixed(2)}
+                                            //     </Text>
+                                            //     <Text>
+                                            //         Número de Parcelas: {simulacao.parcelas}
+                                            //     </Text>
+                                            //     <Text>
+                                            //         Valor da Parcela: R$ {simulacao.valorParcela.toFixed(2)}
+                                            //     </Text>
+                                            // </Box>
                                         )}
                                     </Flex>
                                 )}

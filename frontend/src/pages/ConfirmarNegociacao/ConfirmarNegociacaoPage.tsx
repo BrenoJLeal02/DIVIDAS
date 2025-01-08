@@ -41,6 +41,11 @@ const ConfirmarNegociacaoPage: React.FC = () => {
             ? parseFloat(valorFinalAVista)
             : parseFloat(valorFinalParcelado);
 
+    // Calcular o valor de cada parcela
+    const valorParcela = opcao.tipo === 'Parcelado' && opcao.parcelas
+        ? (valorTotalComDesconto / opcao.parcelas).toFixed(2)
+        : null;
+
     return (
         <Center minHeight="100vh" py={6}>
             <Container maxW="2xl">
@@ -93,10 +98,10 @@ const ConfirmarNegociacaoPage: React.FC = () => {
                             <Divider />
                             <Flex justify="space-between" mt={3}>
                                 <Text fontWeight="bold">
-                                    Desconto sobre a Multa: {opcao.desconto_multa}%
+                                    Desconto sobre a Multa: {opcao.desconto_multa}% 
                                 </Text>
                                 <Text fontWeight="bold">
-                                    Desconto sobre os Juros: {opcao.desconto_juros}%
+                                    Desconto sobre os Juros: {opcao.desconto_juros}% 
                                 </Text>
                             </Flex>
                             <Text mt={2}>
@@ -104,6 +109,11 @@ const ConfirmarNegociacaoPage: React.FC = () => {
                                     ? `Quantidade de Parcelas: ${opcao.parcelas}`
                                     : 'Sem parcelamento disponível.'}
                             </Text>
+                            {opcao.tipo === 'Parcelado' && opcao.parcelas && (
+                                <Text mt={2}>
+                                    <strong>Valor de cada Parcela:</strong> R$ {valorParcela}
+                                </Text>
+                            )}
                             <Box mt={4} p={4} bg="gray.100" borderRadius="md">
                                 <Text fontWeight="bold">Valor Total da Negociação:</Text>
                                 <Text>R$ {valorTotalComDesconto.toFixed(2)}</Text>
@@ -115,9 +125,23 @@ const ConfirmarNegociacaoPage: React.FC = () => {
                         </Text>
 
                         <Flex justify="space-between" mt={6}>
-                            <Button colorScheme="teal" onClick={() => navigate('/')}>
+                            <Button
+                                colorScheme="teal"
+                                onClick={() => navigate('/negociar', {
+                                    state: {
+                                        id,
+                                        opcao,
+                                        valorPrincipal,
+                                        multa,
+                                        juros,
+                                        valorFinalAVista,
+                                        valorFinalParcelado
+                                    }
+                                })}
+                            >
                                 Voltar
                             </Button>
+
                             <Button colorScheme="blue" onClick={() => navigate('/negociacao-processada')}>
                                 Confirmar e Finalizar
                             </Button>
